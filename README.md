@@ -6,6 +6,7 @@ Testing out spark clusters on kubernetes
 
 - Kind
 - k3d
+  - Check: https://github.com/kf5i/k3ai as well
 
 ## Stack
 
@@ -15,6 +16,15 @@ Testing out spark clusters on kubernetes
 
 - Processing Frameworks to test:
   - Dask
+    - try using `KubeCluster` method for adhoc compute 
   - Ray
+    - https://docs.ray.io/en/master/cluster/kubernetes.html#ray-operator
   - Spark
-  - Seldon 
+    - Can test this one too: https://github.com/radanalyticsio/spark-operator
+  - Seldon
+    - https://docs.seldon.io/projects/seldon-core/en/latest/workflow/install.html
+
+## Notes
+
+- Seldon requires `Istio` or `Ambassador` Ingress
+- k3d comes with Traefik but an outdated one
