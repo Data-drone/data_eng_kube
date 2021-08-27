@@ -1,0 +1,20 @@
+apiVersion: k3d.io/v1alpha2
+kind: Simple
+servers: 1
+agents: 4
+image: datadrone/k3d-gpu:latest
+ports:
+  - port: 8081:80
+    nodeFilters:
+      - loadbalancer
+registries:
+  create: true
+options:
+  k3s:
+    extraServerArgs:
+      - --no-deploy=traefik
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true
+  runtime:
+    gpuRequest: all
