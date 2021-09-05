@@ -3,6 +3,6 @@ hub:
 
 singleuser:
   image:
-    name: datadrone/deeplearn_pytorch
-    tag: cuda-11.1
+    name: datadrone/deeplearn_minimal
+    tag: cuda-11.1-base
   defaultUrl: "/lab"
