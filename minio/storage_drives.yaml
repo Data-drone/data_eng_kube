@@ -11,7 +11,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   local:
-    path: /media/brian/SSD Storage/k8s_testing/drive1
+    path: /store
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -34,7 +34,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   local:
-    path: /media/brian/SSD Storage/k8s_testing/drive2
+    path: /store
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -57,7 +57,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   local:
-    path: /media/brian/SSD Storage/k8s_testing/drive3
+    path: /store
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -80,7 +80,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   local:
-    path: /media/brian/SSD Storage/k8s_testing/drive4
+    path: /store
   nodeAffinity:
     required:
       nodeSelectorTerms:

@@ -17,8 +17,5 @@ kubectl apply -f minio/storage_drives.yaml
 
 echo "deploy tenant now"
 # still to test this clause
-#kubectl apply -f minio/minio_tenant.yaml --namespace=minio-tenant
-
-
-
+kubectl apply -f minio/minio_tenant.yaml --namespace=minio-tenant
 
