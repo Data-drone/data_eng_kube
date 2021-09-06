@@ -7,6 +7,22 @@ ports:
   - port: 8081:80
     nodeFilters:
       - loadbalancer
+volumes:
+  - volume: /opt/k8s-test:/data
+    nodeFilters:
+      - agent[*]
+  - volume: /opt/k8s-test/drive1:/store
+    nodeFilters:
+      - agent[0]
+  - volume: /opt/k8s-test/drive2:/store
+    nodeFilters:
+      - agent[1]
+  - volume: /opt/k8s-test/drive3:/store
+    nodeFilters:
+      - agent[2]
+  - volume: /opt/k8s-test/drive4:/store
+    nodeFilters:
+      - agent[3]
 registries:
   create: true
 options:

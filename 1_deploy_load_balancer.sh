@@ -18,5 +18,11 @@ else
     kubectl apply -f load_balancer/namespace.yaml
     kubectl apply -f load_balancer/metallb.yaml
 
+    echo "Wait for load balancer to start"
+    kubectl wait --for=condition=available --timeout=600s deployment/controller -n metallb-system
+    echo "Done"
+
     kubectl apply -f load_balancer/metallb-config-map.yaml
 fi
+
+

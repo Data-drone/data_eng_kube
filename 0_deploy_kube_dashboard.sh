@@ -16,6 +16,10 @@ else
     kubectl apply -f kube_dashboard/dashboard-admin.yaml
 fi
 
+echo "Wait for Kube Dashboard to start"
+kubectl wait --for=condition=available --timeout=600s deployment/kubernetes-dashboard -n kubernetes-dashboard
+
+echo "Done"
 #if curl  > kube_dashboard/dashboard_deploy.yaml
 #then 
 #else echo "Failed to download dashboard deployment script"
