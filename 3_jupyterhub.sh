@@ -2,6 +2,8 @@
 
 # Automation for the jupyterhub deploy
 
+echo "make sure the local-path config for storage retention is deployed"
+kubectl apply -f local-path-config/local-path-config.yaml
 
 helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
 
@@ -14,6 +16,9 @@ helm upgrade --cleanup-on-fail \
   --install jhub1 jupyterhub/jupyterhub \
   --namespace jhub \
   --create-namespace \
-  --version=1 \
+  --version=1.1.3 \
   --values jupyterhub/config.yaml
+
+
+### Notes from https://discourse.jupyter.org/t/jupyterhub-on-k8s-with-traefik/1605
 

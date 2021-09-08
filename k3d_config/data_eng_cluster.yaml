@@ -8,7 +8,7 @@ ports:
     nodeFilters:
       - loadbalancer
 volumes:
-  - volume: /opt/k8s-test:/data
+  - volume: /opt/k8s-test/data:/data
     nodeFilters:
       - agent[*]
   - volume: /opt/k8s-test/drive1:/store
