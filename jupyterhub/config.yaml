@@ -6,3 +6,6 @@ singleuser:
     name: datadrone/deeplearn_minimal
     tag: cuda-11.1-base
   defaultUrl: "/lab"
+  storage:
+    dynamic:
+      storageClass: local-path
