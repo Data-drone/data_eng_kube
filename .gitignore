@@ -1,6 +1,7 @@
 kube_dashboard/dashboard_deploy.yaml
 load_balancer/namespace.yaml
 load_balancer/metallb.yaml
+kustomize
 
 # ignore kind config for now till gpu supported
 kind_nvidia_image
