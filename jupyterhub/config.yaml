@@ -1,5 +1,8 @@
 hub:
   baseUrl: /jupyter
+  config:
+    KubeSpawner:
+      service_account: spark
 
 singleuser:
   image:

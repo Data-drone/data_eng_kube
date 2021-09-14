@@ -16,6 +16,8 @@ helm upgrade --cleanup-on-fail \
   --version=1.1.3 \
   --values jupyterhub/config.yaml
 
+echo "adding service account for spawning spark workers"
+kubectl apply -f jupyterhub/spark-service-user.yaml
 
 ### Notes from https://discourse.jupyter.org/t/jupyterhub-on-k8s-with-traefik/1605
 
