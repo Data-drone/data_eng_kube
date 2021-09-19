@@ -4,7 +4,7 @@ metadata:
   name: storage-vol-0
 spec:
   capacity:
-    storage: 10Gi
+    storage: 100Gi
   volumeMode: Filesystem
   accessModes:
   - ReadWriteOnce
@@ -27,7 +27,7 @@ metadata:
   name: storage-vol-1
 spec:
   capacity:
-    storage: 10Gi
+    storage: 100Gi
   volumeMode: Filesystem
   accessModes:
   - ReadWriteOnce
@@ -50,7 +50,7 @@ metadata:
   name: storage-vol-2
 spec:
   capacity:
-    storage: 10Gi
+    storage: 100Gi
   volumeMode: Filesystem
   accessModes:
   - ReadWriteOnce
@@ -73,7 +73,7 @@ metadata:
   name: storage-vol-3
 spec:
   capacity:
-    storage: 10Gi
+    storage: 100Gi
   volumeMode: Filesystem
   accessModes:
   - ReadWriteOnce

@@ -8,19 +8,19 @@ ports:
     nodeFilters:
       - loadbalancer
 volumes:
-  - volume: /opt/k8s-test/data:/data
+  - volume: /opt/data/common-storage:/data
     nodeFilters:
       - agent[*]
-  - volume: /opt/k8s-test/drive1:/store
+  - volume: /opt/data/minio/drive1:/store
     nodeFilters:
       - agent[0]
-  - volume: /opt/k8s-test/drive2:/store
+  - volume: /opt/data/minio/drive2:/store
     nodeFilters:
       - agent[1]
-  - volume: /opt/k8s-test/drive3:/store
+  - volume: /opt/data/minio/drive3:/store
     nodeFilters:
       - agent[2]
-  - volume: /opt/k8s-test/drive4:/store
+  - volume: /opt/data/minio/drive4:/store
     nodeFilters:
       - agent[3]
 registries:
