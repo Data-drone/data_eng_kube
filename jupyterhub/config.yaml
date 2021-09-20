@@ -6,8 +6,20 @@ hub:
 
 singleuser:
   image:
-    name: datadrone/deeplearn_minimal
-    tag: cuda-11.1-base
+    name: jupyter/minimal-notebook
+    tag: latest
+  profileList:
+    - display_name: "Default Minimal"
+      description: "Simple Base"
+      default: true
+    - display_name: "Spark Env"
+      description: "Jupyer default Spark Env"
+      kubespawner_override:
+        image: jupyter/all-spark-notebook:latest 
+  #  - display_name: "Spark Environment"
+  #    description: "Adds in Spark with GPU enabled"
+  #    kubespawner_override:
+  #      image: datadrone/deeplearn_minimal:cuda-11.1-base
   defaultUrl: "/lab"
   storage:
     dynamic:
