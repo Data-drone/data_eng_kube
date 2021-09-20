@@ -7,3 +7,5 @@ kustomize
 kind_nvidia_image
 
 secrets
+
+temp
