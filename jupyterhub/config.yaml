@@ -4,6 +4,10 @@ hub:
     KubeSpawner:
       service_account: spark
 
+proxy:
+  service:
+    type: ClusterIP
+
 singleuser:
   image:
     name: jupyter/minimal-notebook
@@ -16,10 +20,10 @@ singleuser:
       description: "Jupyer default Spark Env"
       kubespawner_override:
         image: jupyter/all-spark-notebook:latest 
-  #  - display_name: "Spark Environment"
-  #    description: "Adds in Spark with GPU enabled"
+  #  - display_name: "GPU Environment"
+  #    description: "GPU enabled session"
   #    kubespawner_override:
-  #      image: datadrone/deeplearn_minimal:cuda-11.1-base
+  #      image: /deeplearn_minimal:cuda-11.1-base
   defaultUrl: "/lab"
   storage:
     dynamic:

@@ -14,7 +14,7 @@ helm repo update
 
 
 helm upgrade --cleanup-on-fail \
-  --install jhub1 jupyterhub/jupyterhub \
+  --install jupyterhub jupyterhub/jupyterhub \
   --namespace jhub \
   --create-namespace \
   --version=1.1.3 \
