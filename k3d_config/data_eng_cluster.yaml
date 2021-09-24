@@ -2,7 +2,7 @@ apiVersion: k3d.io/v1alpha2
 kind: Simple
 servers: 1
 agents: 4
-image: datadrone/k3d-gpu:latest
+image: datadrone/k3d-gpu:v1.21.3-k3s1-cuda-11-2
 ports:
   - port: 8081:80
     nodeFilters:

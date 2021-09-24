@@ -2,6 +2,9 @@
 
 See: https://k3d.io/usage/guides/cuda/
 
+Updated the daemonset yaml to the one from:
+https://github.com/NVIDIA/k8s-device-plugin/blob/master/nvidia-device-plugin.yml
+
 ## docker build command
 
 ```{bash}

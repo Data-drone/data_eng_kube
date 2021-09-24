@@ -1,17 +1,25 @@
 #!/bin/bash
 
 # Automation for the jupyterhub deploy
+REGISTRY_PORT=$1
 
 helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
 
 helm repo update
 
-#echo "we need to push the image from our local in"
-#k3d image import -c test datadrone/deeplearn_minimal:cuda-11.1-base
+## Process to push images to k3d registry
+# is it better we do this first that the helm chart deploys faster
+push_image() {
+  docker tag $1 localhost:$2/$1
+  docker push localhost:$2/$1
+}
 
-#echo "spark 3.1.1 with gpu image"
-#k3d image import -c test datadrone/spark-worker:3.1.1-hadoop3.2-rapids
+for IMAGE in 'datadrone/deeplearn_minimal:cuda-11.1-base' 'datadrone/spark_notebook_kube:latest'
+do
+  push_image $IMAGE $REGISTRY_PORT
+done
 
+# Load the helm chart
 
 helm upgrade --cleanup-on-fail \
   --install jupyterhub jupyterhub/jupyterhub \

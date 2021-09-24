@@ -1,7 +1,9 @@
-ARG K3S_TAG="v1.21.2-k3s1"
+ARG K3S_TAG="v1.21.3-k3s1"
 FROM rancher/k3s:$K3S_TAG as k3s
 
-FROM nvidia/cuda:11.1.1-base-ubuntu18.04
+ARG CUDA_TAG="11.2.0-base-ubuntu18.04"
+FROM nvidia/cuda:11.2.0-base-ubuntu18.04 
+#$CUDA_TAG
 
 ARG NVIDIA_CONTAINER_RUNTIME_VERSION
 ENV NVIDIA_CONTAINER_RUNTIME_VERSION=$NVIDIA_CONTAINER_RUNTIME_VERSION
@@ -16,9 +18,8 @@ RUN curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | apt-ke
 
 RUN curl -s -L https://nvidia.github.io/nvidia-container-runtime/ubuntu18.04/nvidia-container-runtime.list | tee /etc/apt/sources.list.d/nvidia-container-runtime.list
 
-# =${NVIDIA_CONTAINER_RUNTIME_VERSION}
 RUN apt-get update && \
-    apt-get -y install nvidia-container-runtime=3.5.0-1
+    apt-get -y install nvidia-container-runtime=${NVIDIA_CONTAINER_RUNTIME_VERSION}
 
 COPY --from=k3s / /
 

@@ -16,15 +16,30 @@ singleuser:
     - display_name: "Default Minimal"
       description: "Simple Base"
       default: true
-    - display_name: "Spark Env"
-      description: "Jupyer default Spark Env"
+    - display_name: "GPU Environment"
+      description: "GPU enabled session"
       kubespawner_override:
-        image: jupyter/all-spark-notebook:latest 
-  #  - display_name: "GPU Environment"
-  #    description: "GPU enabled session"
-  #    kubespawner_override:
-  #      image: /deeplearn_minimal:cuda-11.1-base
+        image: datadrone/deeplearn_minimal
+        tag: cuda-11.1-base
+        extra_annotations:
+          gpu-fraction: "1"
+    - display_name: "GPU Spark Environment"
+      description: "GPU enabled spark session"
+      kubespawner_override:
+        image: datadrone/spark_notebook_kube
+        tag: latest
+        extra_annotations:
+          gpu-fraction: "1"
   defaultUrl: "/lab"
   storage:
     dynamic:
       storageClass: local-path
+
+prePuller:
+  extraImages:
+    gpuimage:
+      name: datadrone/deeplearn_minimal
+      tag: cuda-11.1-base
+    gpusparkimage:
+      name: datadrone/spark_notebook_kube
+      tag: latest
