@@ -26,7 +26,7 @@ singleuser:
     - display_name: "GPU Spark Environment"
       description: "GPU enabled spark session"
       kubespawner_override:
-        image: datadrone/spark_notebook_kube
+        image: k3d-test-registry:5000/datadrone/spark_notebook_kube
         tag: latest
         extra_annotations:
           gpu-fraction: "1"
@@ -38,8 +38,8 @@ singleuser:
 prePuller:
   extraImages:
     gpuimage:
-      name: datadrone/deeplearn_minimal
+      name: k3d-test-registry:5000/datadrone/deeplearn_minimal
       tag: cuda-11.1-base
     gpusparkimage:
-      name: datadrone/spark_notebook_kube
+      name: k3d-test-registry:5000/datadrone/spark_notebook_kube
       tag: latest
