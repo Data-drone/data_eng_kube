@@ -9,15 +9,15 @@ helm repo update
 
 ## Process to push images to k3d registry
 # is it better we do this first that the helm chart deploys faster
-push_image() {
-  docker tag $1 localhost:$2/$1
-  docker push localhost:$2/$1
-}
-
-for IMAGE in 'datadrone/deeplearn_minimal:cuda-11.1-base' 'datadrone/spark_notebook_kube:latest'
-do
-  push_image $IMAGE $REGISTRY_PORT
-done
+#push_image() {
+#  docker tag $1 localhost:$2/$1
+#  docker push localhost:$2/$1
+#}
+#
+#for IMAGE in 'datadrone/deeplearn_minimal:cuda-11.1-base' 'datadrone/spark_notebook_kube:latest' 'datadrone/spark-worker:3.1.2-hadoop3.2-rapids'
+#do
+#  push_image $IMAGE $REGISTRY_PORT
+#done
 
 # Load the helm chart
 
@@ -26,6 +26,7 @@ helm upgrade --cleanup-on-fail \
   --namespace jhub \
   --create-namespace \
   --version=1.1.3 \
+  --timeout 10m \
   --values jupyterhub/config.yaml
 
 # rollback: 

@@ -14,7 +14,7 @@ helm upgrade --cleanup-on-fail \
 ```
 
 Updating the Jupyterhub config:
-Chaging the `config.yaml` doesn't require updating the version?
+Changing the `config.yaml` doesn't require updating the version?
 
 
 ```{bash}
@@ -23,21 +23,26 @@ helm upgrade --cleanup-on-fail \
   test1 jupyterhub/jupyterhub \
   --namespace jhub \
   --version=1 \
-  --values config.yaml
+  --values jupyterhub/config.yaml
 
 ```
+
+# Helm rollback and history list
+
+```{bash}
+
+helm rollback jupyterhub 1 --namespace jhub
+
+helm history jupyterhub -n jhub
+
+```
+
 
 # TODO
 
 Current Issues:
 
-- Nvidia images seem to be having issues
-  - Maybe issues with moving /var/lib/docker
-  - Maybe issue with installed jhub version (versions must align)
-  - Doesn't seem to be an issue with kubeflow?
-
 - Default Jhub includes klipper-lb can we replace with metallb?
 
-- Should we look into making is possible to setup custom conda envs as per the guide?
-
 - Registry port for k3d is random at the moment we need to try and automate this so that we don't need to update the docker port all the time
+  - big images causes the helm chart to fail, tested large timeouts but no consistent success so far

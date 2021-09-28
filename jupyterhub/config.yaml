@@ -10,7 +10,7 @@ proxy:
 
 singleuser:
   image:
-    name: jupyter/minimal-notebook
+    name: k3d-test-registry:5000/datadrone/minimal-notebook-env
     tag: latest
   profileList:
     - display_name: "Default Minimal"
@@ -26,8 +26,8 @@ singleuser:
     - display_name: "GPU Spark Environment"
       description: "GPU enabled spark session"
       kubespawner_override:
-        image: k3d-test-registry:5000/datadrone/spark_notebook_kube
-        tag: latest
+        image: k3d-test-registry:5000/datadrone/k8s-spark-notebook
+        tag: 3.1.2-hadoop3.2-rapids
         extra_annotations:
           gpu-fraction: "1"
   defaultUrl: "/lab"
@@ -37,9 +37,12 @@ singleuser:
 
 prePuller:
   extraImages:
+    minimalnotebookenv:
+      name: k3d-test-registry:5000/datadrone/minimal-notebook-env
+      tag: latest
     gpuimage:
       name: k3d-test-registry:5000/datadrone/deeplearn_minimal
       tag: cuda-11.1-base
     gpusparkimage:
-      name: k3d-test-registry:5000/datadrone/spark_notebook_kube
-      tag: latest
+      name: k3d-test-registry:5000/datadrone/k8s-spark-notebook
+      tag: 3.1.2-hadoop3.2-rapids
