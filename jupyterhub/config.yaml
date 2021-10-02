@@ -31,6 +31,9 @@ singleuser:
         extra_annotations:
           gpu-fraction: "1"
   defaultUrl: "/lab"
+  networkPolicy:
+    enabled: true
+    allowedIngressPorts: [2222, 7777] 
   storage:
     dynamic:
       storageClass: local-path

@@ -14,7 +14,7 @@ RUN pip install beautifulsoup4 soupsieve && \
 
 USER $NB_USER
 
-RUN conda create --name spark python=3.8 ipykernel scikit-learn
+RUN conda create --name spark python=3.9 ipykernel scikit-learn
 SHELL ["conda", "run", "-n", "spark", "/bin/bash", "-c"]
 RUN conda install -c conda-forge openjdk=8
 RUN conda install -c conda-forge pyspark==3.1.2
@@ -46,5 +46,7 @@ RUN chmod u+x /opt/spark-jars/hadoop-aws-3.2.0.jar \
 
 USER $NB_USER
 
+EXPOSE 2222
+EXPOSE 7777
 #ADD .condarc ./
 #RUN cat .condarc >> /opt/conda/.condarc
