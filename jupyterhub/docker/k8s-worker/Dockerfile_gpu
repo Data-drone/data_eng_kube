@@ -1,0 +1,103 @@
+# Dependencies Container Image
+# Install wget to retrieve Spark runtime components,
+# extract to temporary directory, copy to the desired image
+FROM ubuntu:20.04 as deps
+
+RUN apt-get update && apt-get -y install wget
+WORKDIR /tmp
+RUN wget http://mirrors.gigenet.com/apache/spark/spark-3.1.2/spark-3.1.2-bin-hadoop3.2.tgz \
+	&& tar xvzf spark-3.1.2-bin-hadoop3.2.tgz
+
+FROM nvidia/cuda:11.1.1-base-ubuntu20.04 AS build
+
+# Spark UID
+ARG spark_uid=185
+
+RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y curl bash openjdk-8-jdk
+
+
+# Install Spark Dependencies and Prepare Spark Runtime Environment
+RUN set -ex && \
+    apt-get update && \
+    ln -s /lib /lib64 && \
+    apt install -y bash tini libc6 libpam-modules libnss3 wget && \
+    mkdir -p /opt/spark && \
+    mkdir -p /opt/spark/examples && \
+    mkdir -p /opt/spark/work-dir && \
+    touch /opt/spark/RELEASE && \
+    rm /bin/sh && \
+    ln -sv /bin/bash /bin/sh && \
+    ln -sv /usr/bin/tini /sbin/tini && \
+    echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su && \
+    chgrp root /etc/passwd && chmod ug+rw /etc/passwd && \
+    rm -rf /var/cache/apt/*
+
+# Lets get conda and python setup
+ENV CONDA_DIR=/opt/conda \
+    SHELL=/bin/bash
+ENV PATH="${CONDA_DIR}/bin:${PATH}"
+
+RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashrc && \
+   # Add call to conda init script see https://stackoverflow.com/a/58081608/4413446
+   echo 'eval "$(command conda shell.bash hook 2> /dev/null)"' >> /etc/skel/.bashrc
+
+RUN mkdir -p "${CONDA_DIR}"
+
+# should default to python 3.9
+ARG PYTHON_VERSION=default
+
+RUN set -x && \
+    # Miniforge installer
+    miniforge_arch=$(uname -m) && \
+    miniforge_installer="Mambaforge-Linux-${miniforge_arch}.sh" && \
+    wget --quiet "https://github.com/conda-forge/miniforge/releases/latest/download/${miniforge_installer}" && \
+    /bin/bash "${miniforge_installer}" -f -b -p "${CONDA_DIR}" && \
+    rm "${miniforge_installer}" && \
+    # Conda configuration see https://conda.io/projects/conda/en/latest/configuration.html
+    conda config --system --set auto_update_conda false && \
+    conda config --system --set show_channel_urls true && \
+    if [[ "${PYTHON_VERSION}" != "default" ]]; then mamba install --quiet --yes python="${PYTHON_VERSION}"; fi && \
+    mamba list python | grep '^python ' | tr -s ' ' | cut -d ' ' -f 1,2 >> "${CONDA_DIR}/conda-meta/pinned" && \
+    # Using conda to update all packages: https://github.com/mamba-org/mamba/issues/1092
+    conda update --all --quiet --yes && \
+    conda clean --all -f -y && \
+    ln -sv /opt/conda/bin/python /usr/bin/python && \
+    ln -sv /opt/conda/bin/pip /usr/bin/pip
+
+
+# Install Kerberos Client and Auth Components
+ENV DEBIAN_FRONTEND=noninteractive
+#RUN apt-get update \
+#  && apt install -yqq krb5-user \
+#  && rm -rf /var/cache/apt/*
+
+# Copy previously fetched runtime components
+COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/bin /opt/spark/bin
+COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/jars /opt/spark/jars
+COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/python /opt/spark/python
+COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/R /opt/spark/R
+COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/sbin /opt/spark/sbin
+COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/yarn /opt/spark/yarn
+
+# Copy Docker entry script
+COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/kubernetes/dockerfiles/spark/entrypoint.sh /opt/
+
+# COpy examples, data, and tests
+COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/examples /opt/spark/examples
+COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/data /opt/spark/data
+COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/kubernetes/tests /opt/spark/tests
+
+
+# Set Spark runtime options
+ENV SPARK_HOME /opt/spark
+ENV PATH $PATH:$SPARK_HOME/bin
+ENV SPARK_CLASSPATH /opt/spark/jars/*
+ENV PYSPARK_PYTHON /opt/conda/bin/python
+
+WORKDIR /opt/spark/work-dir
+RUN chmod g+w /opt/spark/work-dir
+
+ENTRYPOINT [ "/opt/entrypoint.sh" ]
+
+# Specify the User that the actual main process will run as
+USER ${spark_uid}

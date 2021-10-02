@@ -1,26 +1,36 @@
 # Dependencies Container Image
 # Install wget to retrieve Spark runtime components,
 # extract to temporary directory, copy to the desired image
-FROM ubuntu:20.04 as deps
+FROM ubuntu:20.04 AS deps
 
 RUN apt-get update && apt-get -y install wget
 WORKDIR /tmp
 RUN wget http://mirrors.gigenet.com/apache/spark/spark-3.1.2/spark-3.1.2-bin-hadoop3.2.tgz \
 	&& tar xvzf spark-3.1.2-bin-hadoop3.2.tgz 
 
-FROM nvidia/cuda:11.1.1-base-ubuntu20.04 AS build
+# test run updating the kubernetes model
+ENV K8_CLIENT=5.4.0
+
+WORKDIR /tmp/k8s
+# https://repo1.maven.org/maven2/io/fabric8/kubernetes-model-common/5.4.0/kubernetes-model-common-5.4.0.jar
+RUN wget https://repo1.maven.org/maven2/io/fabric8/kubernetes-client/${K8_CLIENT}/kubernetes-client-${K8_CLIENT}.jar && \
+    wget https://repo1.maven.org/maven2/io/fabric8/kubernetes-model/${K8_CLIENT}/kubernetes-model-${K8_CLIENT}.jar && \
+    wget https://repo1.maven.org/maven2/io/fabric8/kubernetes-model-common/${K8_CLIENT}/kubernetes-model-common-${K8_CLIENT}.jar
+
+
+
+# Runtime Container Image. Adapted from the official Spark runtime 
+# image from the project repository at https://github.com/apache/spark.
+FROM openjdk:8-jdk-slim AS build
 
 # Spark UID
 ARG spark_uid=185
-
-RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y curl bash openjdk-8-jdk
-
 
 # Install Spark Dependencies and Prepare Spark Runtime Environment
 RUN set -ex && \
     apt-get update && \
     ln -s /lib /lib64 && \
-    apt install -y bash tini libc6 libpam-modules libnss3 wget && \
+    apt install -y bash tini libc6 libpam-modules libnss3 wget python3 python3-pip && \
     mkdir -p /opt/spark && \
     mkdir -p /opt/spark/examples && \
     mkdir -p /opt/spark/work-dir && \
@@ -30,46 +40,16 @@ RUN set -ex && \
     ln -sv /usr/bin/tini /sbin/tini && \
     echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su && \
     chgrp root /etc/passwd && chmod ug+rw /etc/passwd && \
+    ln -sv /usr/bin/python3 /usr/bin/python && \
+    ln -sv /usr/bin/pip3 /usr/bin/pip \
     rm -rf /var/cache/apt/*
-
-# Lets get conda and python setup
-ENV CONDA_DIR=/opt/conda \
-    SHELL=/bin/bash
-ENV PATH="${CONDA_DIR}/bin:${PATH}"
-
-RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashrc && \
-   # Add call to conda init script see https://stackoverflow.com/a/58081608/4413446
-   echo 'eval "$(command conda shell.bash hook 2> /dev/null)"' >> /etc/skel/.bashrc
-
-RUN mkdir -p "${CONDA_DIR}"
-
-# should default to python 3.9
-ARG PYTHON_VERSION=default
-
-RUN set -x && \
-    # Miniforge installer
-    miniforge_arch=$(uname -m) && \
-    miniforge_installer="Mambaforge-Linux-${miniforge_arch}.sh" && \
-    wget --quiet "https://github.com/conda-forge/miniforge/releases/latest/download/${miniforge_installer}" && \
-    /bin/bash "${miniforge_installer}" -f -b -p "${CONDA_DIR}" && \
-    rm "${miniforge_installer}" && \
-    # Conda configuration see https://conda.io/projects/conda/en/latest/configuration.html
-    conda config --system --set auto_update_conda false && \
-    conda config --system --set show_channel_urls true && \
-    if [[ "${PYTHON_VERSION}" != "default" ]]; then mamba install --quiet --yes python="${PYTHON_VERSION}"; fi && \
-    mamba list python | grep '^python ' | tr -s ' ' | cut -d ' ' -f 1,2 >> "${CONDA_DIR}/conda-meta/pinned" && \
-    # Using conda to update all packages: https://github.com/mamba-org/mamba/issues/1092
-    conda update --all --quiet --yes && \
-    conda clean --all -f -y && \
-    ln -sv /opt/conda/bin/python /usr/bin/python && \
-    ln -sv /opt/conda/bin/pip /usr/bin/pip
-
 
 # Install Kerberos Client and Auth Components
 ENV DEBIAN_FRONTEND=noninteractive
-#RUN apt-get update \
-#  && apt install -yqq krb5-user \
-#  && rm -rf /var/cache/apt/*
+RUN apt-get update \
+  && apt install -yqq krb5-user \
+  && rm -rf /var/cache/apt/*
+
 
 # Copy previously fetched runtime components
 COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/bin /opt/spark/bin
@@ -87,10 +67,26 @@ COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/examples /opt/spark/examples
 COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/data /opt/spark/data
 COPY --from=deps /tmp/spark-3.1.2-bin-hadoop3.2/kubernetes/tests /opt/spark/tests
 
+# Replace out of date dependencies causing a 403 error on job launch
+#RUN rm -rf /opt/spark/jars/kubernetes-client-* \
+#    && rm -rf /opt/spark/jars/kubernetes-model-* \
+#    && rm -rf /opt/spark/jars/kubernetes-model-common-*
+#
+#COPY --from=deps /tmp/k8s /opt/spark/jars
+
+#WORKDIR /tmp
+#RUN cd /tmp \
+#  && wget https://oak-tree.tech/documents/59/kubernetes-client-4.6.4.jar \
+#  && wget https://oak-tree.tech/documents/58/kubernetes-model-4.6.4.jar \
+#  && wget https://oak-tree.tech/documents/57/kubernetes-model-common-4.6.4.jar \
+#  && rm -rf /opt/spark/jars/kubernetes-client-* \
+#  && rm -rf /opt/spark/jars/kubernetes-model-* \
+#  && rm -rf /opt/spark/jars/kubernetes-model-common-* \
+#  && mv /tmp/kubernetes-* /opt/spark/jars/
+
 
 # Set Spark runtime options
 ENV SPARK_HOME /opt/spark
-ENV PYSPARK_PYTHON /opt/conda/bin/python
 
 WORKDIR /opt/spark/work-dir
 RUN chmod g+w /opt/spark/work-dir
