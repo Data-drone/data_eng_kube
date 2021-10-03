@@ -8,7 +8,7 @@ WORKDIR /tmp
 RUN wget http://mirrors.gigenet.com/apache/spark/spark-3.1.2/spark-3.1.2-bin-hadoop3.2.tgz \
 	&& tar xvzf spark-3.1.2-bin-hadoop3.2.tgz
 
-FROM nvidia/cuda:11.1.1-base-ubuntu20.04 AS build
+FROM nvidia/cuda:11.1.1-runtime-ubuntu20.04 AS build
 
 # Spark UID
 ARG spark_uid=185
@@ -116,11 +116,15 @@ RUN wget -O /opt/sparkRapidsPlugin/getGpusResources.sh https://raw.githubusercon
 
 RUN chmod u+x /opt/sparkRapidsPlugin/getGpusResources.sh \
       && chmod u+x /opt/sparkRapidsPlugin/rapids-4-spark_2.12-${RAPIDS_PLUGIN_VERSION}.jar \
-      && chmod u+x /opt/sparkRapidsPlugin/cudf-${CUDF_VERSION}-cuda11.jar
+      && chmod u+x /opt/sparkRapidsPlugin/cudf-${CUDF_VERSION}-cuda11.jar \
+      && chown ${spark_uid} /opt/sparkRapidsPlugin/getGpusResources.sh \
+      && chown ${spark_uid} /opt/sparkRapidsPlugin/rapids-4-spark_2.12-${RAPIDS_PLUGIN_VERSION}.jar \
+      && chown ${spark_uid} /opt/sparkRapidsPlugin/cudf-${CUDF_VERSION}-cuda11.jar
 
+RUN chmod g+w -R /opt/sparkRapidsPlugin
 
 WORKDIR /opt/spark/work-dir
-RUN chmod g+w /opt/spark/work-dir
+RUN chmod g+w /opt/spark/work-dir 
 
 ENTRYPOINT [ "/opt/entrypoint.sh" ]
 
