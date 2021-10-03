@@ -94,6 +94,31 @@ ENV PATH $PATH:$SPARK_HOME/bin
 ENV SPARK_CLASSPATH /opt/spark/jars/*
 ENV PYSPARK_PYTHON /opt/conda/bin/python
 
+# add folder for jars we need to bake in
+RUN mkdir /opt/spark-jars
+
+RUN wget -O /opt/spark-jars/hadoop-aws-3.2.0.jar https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.2.0/hadoop-aws-3.2.0.jar
+RUN wget -O /opt/spark-jars/delta-core_2.12-1.0.0.jar https://repo1.maven.org/maven2/io/delta/delta-core_2.12/1.0.0/delta-core_2.12-1.0.0.jar
+RUN wget -O /opt/spark-jars/aws-java-sdk-bundle-1.11.375.jar https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.11.375/aws-java-sdk-bundle-1.11.375.jar
+
+RUN chmod u+x /opt/spark-jars/hadoop-aws-3.2.0.jar \
+      && chmod u+x /opt/spark-jars/delta-core_2.12-1.0.0.jar \
+      && chmod u+x /opt/spark-jars/aws-java-sdk-bundle-1.11.375.jar
+
+# make fill rapids folder
+ENV RAPIDS_PLUGIN_VERSION=21.08.0
+ENV CUDF_VERSION=21.08.2
+
+RUN mkdir /opt/sparkRapidsPlugin
+RUN wget -O /opt/sparkRapidsPlugin/rapids-4-spark_2.12-${RAPIDS_PLUGIN_VERSION}.jar https://repo1.maven.org/maven2/com/nvidia/rapids-4-spark_2.12/${RAPIDS_PLUGIN_VERSION}/rapids-4-spark_2.12-${RAPIDS_PLUGIN_VERSION}.jar
+RUN wget -O /opt/sparkRapidsPlugin/cudf-${CUDF_VERSION}-cuda11.jar https://repo1.maven.org/maven2/ai/rapids/cudf/${CUDF_VERSION}/cudf-${CUDF_VERSION}-cuda11.jar
+RUN wget -O /opt/sparkRapidsPlugin/getGpusResources.sh https://raw.githubusercontent.com/apache/spark/master/examples/src/main/scripts/getGpusResources.sh
+
+RUN chmod u+x /opt/sparkRapidsPlugin/getGpusResources.sh \
+      && chmod u+x /opt/sparkRapidsPlugin/rapids-4-spark_2.12-${RAPIDS_PLUGIN_VERSION}.jar \
+      && chmod u+x /opt/sparkRapidsPlugin/cudf-${CUDF_VERSION}-cuda11.jar
+
+
 WORKDIR /opt/spark/work-dir
 RUN chmod g+w /opt/spark/work-dir
 

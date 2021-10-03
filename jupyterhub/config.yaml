@@ -12,6 +12,7 @@ singleuser:
   image:
     name: k3d-test-registry:5000/datadrone/minimal-notebook-env
     tag: latest
+    pullPolicy: "Always"
   profileList:
     - display_name: "Default Minimal"
       description: "Simple Base"
@@ -27,7 +28,8 @@ singleuser:
       description: "GPU enabled spark session"
       kubespawner_override:
         image: k3d-test-registry:5000/datadrone/k8s-spark-notebook
-        tag: 3.1.2-hadoop3.2-rapids
+        tag: latest
+        image_pull_policy: 'Always'
         extra_annotations:
           gpu-fraction: "1"
   defaultUrl: "/lab"
@@ -39,13 +41,13 @@ singleuser:
       storageClass: local-path
 
 prePuller:
+  hook:
+    enabled: true
   extraImages:
-    minimalnotebookenv:
-      name: k3d-test-registry:5000/datadrone/minimal-notebook-env
-      tag: latest
-    gpuimage:
-      name: k3d-test-registry:5000/datadrone/deeplearn_minimal
-      tag: cuda-11.1-base
-    gpusparkimage:
-      name: k3d-test-registry:5000/datadrone/k8s-spark-notebook
-      tag: 3.1.2-hadoop3.2-rapids
+    sparkworkerimage:
+      name: k3d-test-registry:5000/datadrone/k8s-spark-worker
+      tag: 3.1.2-hadoop3.2-rapids-k8s-basic
+    gpusparkworkerimage:
+      name: k3d-test-registry:5000/datadrone/k8s-spark-worker
+      tag: 3.1.2-hadoop3.2-rapids-k8s
+      

@@ -14,7 +14,7 @@ RUN pip install beautifulsoup4 soupsieve && \
 
 USER $NB_USER
 
-RUN conda create --name spark python=3.9 ipykernel scikit-learn
+RUN conda create --name spark python=3.8 ipykernel scikit-learn
 SHELL ["conda", "run", "-n", "spark", "/bin/bash", "-c"]
 RUN conda install -c conda-forge openjdk=8
 RUN conda install -c conda-forge pyspark==3.1.2
@@ -40,9 +40,13 @@ RUN mkdir /opt/spark-jars
 
 RUN wget -O /opt/spark-jars/hadoop-aws-3.2.0.jar https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.2.0/hadoop-aws-3.2.0.jar
 RUN wget -O /opt/spark-jars/delta-core_2.12-1.0.0.jar https://repo1.maven.org/maven2/io/delta/delta-core_2.12/1.0.0/delta-core_2.12-1.0.0.jar
+RUN wget -O /opt/spark-jars/aws-java-sdk-bundle-1.11.375.jar https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.11.375/aws-java-sdk-bundle-1.11.375.jar
 
 RUN chmod u+x /opt/spark-jars/hadoop-aws-3.2.0.jar \
-      && chmod u+x /opt/spark-jars/delta-core_2.12-1.0.0.jar
+      && chmod u+x /opt/spark-jars/delta-core_2.12-1.0.0.jar \
+      && chmod u+x /opt/spark-jars/aws-java-sdk-bundle-1.11.375.jar
+
+RUN chown -R $NB_USER:users /opt/spark-jars
 
 USER $NB_USER
 
