@@ -1,3 +1,6 @@
 [submodule "kubeflow/manifests"]
 	path = kubeflow/manifests
 	url = https://github.com/Data-drone/manifests.git
+[submodule "postgres-operator-examples"]
+	path = postgres-operator-examples
+	url = https://github.com/Data-drone/postgres-operator-examples.git
