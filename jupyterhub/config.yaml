@@ -35,7 +35,11 @@ singleuser:
   defaultUrl: "/lab"
   networkPolicy:
     enabled: true
-    allowedIngressPorts: [2222, 7777] 
+    ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            spark-role: executor 
   storage:
     dynamic:
       storageClass: local-path

@@ -1,0 +1,74 @@
+# Creating MLflow deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlflow-deployment
+  namespace: mlflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlflow-deployment
+  template:
+    metadata:
+      labels:
+        app: mlflow-deployment
+    spec:
+      containers:
+      - name: mlflow-deployment
+        image: datadrone/mlflow-server:1.0.8
+        imagePullPolicy: Always
+        env:
+        - name: DB_ADDR
+          valueFrom: { secretKeyRef: { name: mlflow-pguser-mlflow, key: host } }
+        - name: DB_PORT
+          valueFrom: { secretKeyRef: { name: mlflow-pguser-mlflow, key: port } }
+        - name: DB_DATABASE
+          valueFrom: { secretKeyRef: { name: mlflow-pguser-mlflow, key: dbname } }
+        - name: DB_USER
+          valueFrom: { secretKeyRef: { name: mlflow-pguser-mlflow, key: user } }
+        - name: DB_PASSWORD
+          valueFrom: { secretKeyRef: { name: mlflow-pguser-mlflow, key: password } }
+        - name: MLFLOW_S3_ENDPOINT_URL
+          value: minio.minio-tenant.svc.cluster.local
+        - name: AWS_ACCESS_KEY_ID
+          value: "AKIAIOSFODNN7EXAMPLE"
+        - name: AWS_SECRET_ACCESS_KEY
+          value: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+        ports:
+        - name: http
+          containerPort: 5000
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mlflow-service
+  namespace: mlflow
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5000
+      protocol: TCP
+      name: http
+  selector:
+    app: mlflow-deployment
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mlflow-ingress
+  namespace: mlflow
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+        - path: /mlflow
+          pathType: Prefix
+          backend:
+            service:
+              name: mlflow-service
+              port:
+                number: 5000
