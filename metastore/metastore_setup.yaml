@@ -1,0 +1,63 @@
+# hive metastore
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hive-metastore
+  namespace: metastore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hive-metastore
+  template:
+    metadata:
+      labels:
+        app: hive-metastore
+    spec:
+      containers:
+      - name: hive-metastore
+        image: datadrone/k8s-metastore:0.1.1
+        imagePullPolicy: Always
+        env:
+        - name: METASTORE_DB_HOST
+          valueFrom: { secretKeyRef: { name: metastore-pguser-metastore, key: host } }
+        - name: METASTORE_DB_PORT
+          valueFrom: { secretKeyRef: { name: metastore-pguser-metastore, key: port } }
+        - name: METASTORE_DB_DB
+          valueFrom: { secretKeyRef: { name: metastore-pguser-metastore, key: dbname } }
+        - name: METASTORE_DB_USER
+          valueFrom: { secretKeyRef: { name: metastore-pguser-metastore, key: user } }
+        - name: METASTORE_DB_PASS
+          valueFrom: { secretKeyRef: { name: metastore-pguser-metastore, key: password } }
+        - name: MINIO_ENDPOINT
+          value: minio-hl.minio-tenant.svc.cluster.local:9000
+        - name: MINIO_ROOT_USER
+          value: "AKIAIOSFODNN7EXAMPLE"
+        - name: MINIO_ROOT_PASSWORD
+          value: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+        - name: INITIALISE
+          value: "no"
+        ports:
+        - name: thrift
+          containerPort: 9083
+          protocol: TCP
+        livenessProbe:
+            tcpSocket:
+              port: 9083
+        readinessProbe:
+          tcpSocket:
+            port: 9083
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metastore-service
+  namespace: metastore
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9083
+      protocol: TCP
+      name: thrift
+  selector:
+    app: metastore-deployment
