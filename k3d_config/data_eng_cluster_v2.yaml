@@ -1,0 +1,54 @@
+kind: Simple
+apiVersion: k3d.io/v1alpha3
+name: "data-platform"
+servers: 1
+agents: 4
+kubeAPI: {}
+image: datadrone/k3d-gpu:v1.21.3-k3s1-cuda-11-2
+volumes:
+- volume: /opt/data/common-storage:/data
+  nodeFilters:
+  - agent:*
+- volume: /opt/data/minio/drive1:/store
+  nodeFilters:
+  - agent:0
+- volume: /opt/data/minio/drive2:/store
+  nodeFilters:
+  - agent:1
+- volume: /opt/data/minio/drive3:/store
+  nodeFilters:
+  - agent:2
+- volume: /opt/data/minio/drive4:/store
+  nodeFilters:
+  - agent:3
+ports:
+- port: 8081:80
+  nodeFilters:
+  - loadbalancer
+options:
+  k3d:
+    wait: false
+    timeout: 0s
+    disableLoadbalancer: false
+    disableImageVolume: false
+    disableRollback: false
+  k3s:
+    extraArgs:
+    - arg: --no-deploy=traefik
+      nodeFilters:
+      - server:*
+    nodeLabels: []
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true
+  runtime:
+    gpuRequest: all
+    serversMemory: ""
+    agentsMemory: ""
+    labels: []
+env: []
+registries:
+  create:
+    name: k3d--registry
+    host: 0.0.0.0
+    hostPort: "5051"
