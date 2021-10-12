@@ -1,47 +1,35 @@
-# Spark on K8s
+# Build a Data Platform on k8s
 
-Testing out spark clusters on kubernetes
+Building out a full ML Platform on k8s
 
 ## Tools used
 
 - Kind
 - k3d
-  - Check: https://github.com/kf5i/k3ai as well
-
-    Startup with a Registry and an ingress port
-
     For k3d setting up kubeconfig see:
     https://k3d.io/usage/kubeconfig/
 
 
     ```{bash}
 
-    # k3d setup with yaml
-    export CLUSTER_NAME=test && k3d cluster create $CLUSTER_NAME \
-    --config k3d_config/data_eng_cluster.yaml 
+    # k3d quick test
+    export CLUSTER_NAME=cputest && k3d cluster create $CLUSTER_NAME
 
-    # registry.gitlab.com/vainkop1/k3s-gpu:v1.21.2-k3s1
-    export CLUSTER_NAME=test && k3d cluster create $CLUSTER_NAME \
-    --image=datadrone/k3d-gpu:latest \
-    -p "8081:80@loadbalancer" \
-    --gpus=all --registry-create \
-    --kubeconfig-update-default
+    # k3d quick gpu test
+    export CLUSTER_NAME=gputest && k3d cluster create $CLUSTER_NAME \
+    --image=datadrone/k3d-gpu:v1.21.3-k3s1-cuda-11-2 --gpus=all
+
+    kubectl apply -f cluster_host_images/k3d_cuda_image/cuda-vector-add.yaml
+
+    # k3d setup with yaml - 5.0 - Also display the default local path provisioner
+    k3d cluster create data-platform \
+    --k3s-arg "--disable=local-storage@server:* \
+    --config k3d_config/data_eng_cluster_v2.yaml
 
     # if we need to update kubeconfig later
     k3d kubeconfig merge test --kubeconfig-merge-default 
 
     ```
-
-  Checking k3d ingress:
-  - Build k3d with the node count we need for Minio with traefik
-
-  ```{bash}
-
-  export CLUSTER_NAME=test && \
-  k3d cluster create $CLUSTER_NAME \
-    --config k3d_config/data_eng_cluster.yaml
-
-  ```
 ## Stack
 
 - Jupyterhub for data science
@@ -50,13 +38,15 @@ Testing out spark clusters on kubernetes
 - Minio for Cloud storage
   - Needs 4 nodes by current config
 
+- Processing Frameworks:
+  - Spark
+    - via Jupyter
+
 - Processing Frameworks to test:
   - Dask
     - try using `KubeCluster` method for adhoc compute 
   - Ray
     - https://docs.ray.io/en/master/cluster/kubernetes.html#ray-operator
-  - Spark
-    - Can test this one too: https://github.com/radanalyticsio/spark-operator
   - Seldon
     - https://docs.seldon.io/projects/seldon-core/en/latest/workflow/install.html
 
