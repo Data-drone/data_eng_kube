@@ -23,7 +23,7 @@ Building out a full ML Platform on k8s
 
     # k3d setup with yaml - 5.0 - Also display the default local path provisioner
     k3d cluster create data-platform \
-    --k3s-arg "--disable=local-storage@server:* \
+    --k3s-arg "--disable=local-storage@server:*" \
     --config k3d_config/data_eng_cluster_v2.yaml
 
     # if we need to update kubeconfig later
