@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: basic-minio-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      protocol: TCP
+      name: api
+  selector:
+    app: basic-minio
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: basic-minio-console
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9001
+      protocol: TCP
+      name: console
+  selector:
+    app: basic-minio

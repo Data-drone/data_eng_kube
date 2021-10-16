@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minio-endpoint-configmap
+  annotations:
+    kubed.appscode.com/sync: "true"
+data:
+  minio_endpoint: basic-minio-service.basic-minio.svc.cluster.local

@@ -1,0 +1,43 @@
+# Create a simple single node Minio linked to root drive
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: basic-minio
+  namespace: minio
+spec:
+  selector:
+    matchLabels:
+      app: basic-minio
+  serviceName: "basic-minio"
+  template:
+    metadata:
+      labels:
+        app: basic-minio
+    spec:
+      containers:
+      - name: basic-minio
+        image: minio/minio:RELEASE.2021-10-10T16-53-30Z
+        imagePullPolicy: IfNotPresent
+        args: ["server", "--console-address", "0.0.0.0:9001", "/data"]
+        env:
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              name: minio-secret
+              key: minio-root-user
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: minio-secret
+              key: minio-root-password 
+        ports:
+        - containerPort: 9000
+        - containerPort: 9001
+        volumeMounts:
+        - name: storage
+          mountPath: "/data"
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: minio-pv-claim
+        

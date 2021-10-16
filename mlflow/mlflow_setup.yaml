@@ -30,11 +30,11 @@ spec:
         - name: DB_PASSWORD
           valueFrom: { secretKeyRef: { name: mlflow-pguser-mlflow, key: password } }
         - name: MLFLOW_S3_ENDPOINT_URL
-          value: minio.minio-tenant.svc.cluster.local
+          valueFrom: { configMapKeyRef: { name: minio-endpoint-configmap, key: minio_endpoint } }
         - name: AWS_ACCESS_KEY_ID
-          value: "AKIAIOSFODNN7EXAMPLE"
+          valueFrom: { secretKeyRef: { name: minio-secret, key: minio-root-user } }
         - name: AWS_SECRET_ACCESS_KEY
-          value: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+          valueFrom: { secretKeyRef: { name: minio-secret, key: minio-root-password } }
         ports:
         - name: http
           containerPort: 5000
