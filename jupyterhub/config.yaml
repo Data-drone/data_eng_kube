@@ -19,6 +19,9 @@ singleuser:
     MINIO_ENDPOINT: 
       name: MINIO_ENDPOINT
       valueFrom: { configMapKeyRef: { name: minio-endpoint-configmap, key: minio_endpoint } }
+    MINIO_PORT:
+      name: MINIO_PORT
+      valueFrom: { configMapKeyRef: { name: minio-endpoint-configmap, key: minio_service_port } }
   image:
     name: k3d--registry:5000/datadrone/minimal-notebook-env
     tag: latest

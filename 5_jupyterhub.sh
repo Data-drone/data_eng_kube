@@ -1,23 +1,9 @@
 #!/bin/bash
 
 # Automation for the jupyterhub deploy
-REGISTRY_PORT=$1
-
+echo "tag and push images into registry first"
 helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
-
 helm repo update
-
-## Process to push images to k3d registry
-# is it better we do this first that the helm chart deploys faster
-#push_image() {
-#  docker tag $1 localhost:$2/$1
-#  docker push localhost:$2/$1
-#}
-#
-#for IMAGE in 'datadrone/deeplearn_minimal:cuda-11.1-base' 'datadrone/spark_notebook_kube:latest' 'datadrone/spark-worker:3.1.2-hadoop3.2-rapids'
-#do
-#  push_image $IMAGE $REGISTRY_PORT
-#done
 
 # Load the helm chart
 
