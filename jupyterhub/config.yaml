@@ -9,8 +9,18 @@ proxy:
     type: ClusterIP
 
 singleuser:
+  extraEnv:
+    MINIO_USER: 
+      name: MINIO_USER
+      valueFrom: { secretKeyRef: { name: minio-secret, key: minio-root-user } }
+    MINIO_PASS: 
+      name: MINIO_PASS
+      valueFrom: { secretKeyRef: { name: minio-secret, key: minio-root-password } }
+    MINIO_ENDPOINT: 
+      name: MINIO_ENDPOINT
+      valueFrom: { configMapKeyRef: { name: minio-endpoint-configmap, key: minio_endpoint } }
   image:
-    name: k3d-test-registry:5000/datadrone/minimal-notebook-env
+    name: k3d--registry:5000/datadrone/minimal-notebook-env
     tag: latest
     pullPolicy: "Always"
   profileList:
@@ -20,15 +30,15 @@ singleuser:
     - display_name: "GPU Environment"
       description: "GPU enabled session"
       kubespawner_override:
-        image: datadrone/deeplearn_minimal
+        image: k3d--registry:5000/datadrone/deeplearn_minimal
         tag: cuda-11.1-base
         extra_annotations:
           gpu-fraction: "1"
     - display_name: "GPU Spark Environment"
       description: "GPU enabled spark session"
       kubespawner_override:
-        image: k3d-test-registry:5000/datadrone/k8s-spark-notebook
-        tag: latest
+        image: k3d--registry:5000/datadrone/k8s-spark-notebook
+        tag: 3.1.2-hadoop3.2-rapids
         image_pull_policy: 'Always'
         extra_annotations:
           gpu-fraction: "1"
@@ -49,9 +59,9 @@ prePuller:
     enabled: true
   extraImages:
     sparkworkerimage:
-      name: k3d-test-registry:5000/datadrone/k8s-spark-worker
+      name: k3d--registry:5000/datadrone/k8s-spark-worker
       tag: 3.1.2-hadoop3.2-rapids-k8s-basic
     gpusparkworkerimage:
-      name: k3d-test-registry:5000/datadrone/k8s-spark-worker
+      name: k3d--registry:5000/datadrone/k8s-spark-worker
       tag: 3.1.2-hadoop3.2-rapids-k8s
       
