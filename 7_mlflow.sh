@@ -9,5 +9,8 @@ kubectl apply -k mlflow/postgres
 # sleep 30
 kubectl wait --for=condition=Ready --timeout=600s pod -l postgres-operator.crunchydata.com/cluster=mlflow -n mlflow
 
+# create minio bucket
+kubectl apply -f mlflow/initialise_mlflow.py
+
 # create the mlflow instance
 kubectl apply -f mlflow/mlflow_setup.py
