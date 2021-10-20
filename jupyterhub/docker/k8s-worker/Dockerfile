@@ -90,10 +90,12 @@ RUN mkdir /opt/spark-jars
 RUN wget -O /opt/spark-jars/hadoop-aws-3.2.0.jar https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.2.0/hadoop-aws-3.2.0.jar
 RUN wget -O /opt/spark-jars/delta-core_2.12-1.0.0.jar https://repo1.maven.org/maven2/io/delta/delta-core_2.12/1.0.0/delta-core_2.12-1.0.0.jar
 RUN wget -O /opt/spark-jars/aws-java-sdk-bundle-1.11.375.jar https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.11.375/aws-java-sdk-bundle-1.11.375.jar
+RUN wget -O /opt/spark-jars/postgresql-42.2.24.jar https://jdbc.postgresql.org/download/postgresql-42.2.24.jar
 
 RUN chmod u+x /opt/spark-jars/hadoop-aws-3.2.0.jar \
       && chmod u+x /opt/spark-jars/delta-core_2.12-1.0.0.jar \
-      && chmod u+x /opt/spark-jars/aws-java-sdk-bundle-1.11.375.jar
+      && chmod u+x /opt/spark-jars/aws-java-sdk-bundle-1.11.375.jar \
+      && chmod u+x /opt/spark-jars/postgresql-42.2.24.jar
 
 # Set Spark runtime options
 ENV SPARK_HOME /opt/spark
