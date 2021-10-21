@@ -25,7 +25,7 @@ CHECKFILE=/opt/apache-hive-metastore-3.0.0-bin/conf/initialised
 if [ -f "$CHECKFILE" ] || [ "$INITIALISE"="no" ]; then
     echo "DB initialised skipping init."
 else
-    /opt/apache-hive-metastore-3.0.0-bin/bin/schematool -initSchema -dbType postgres
+    /opt/apache-hive-metastore-3.0.0-bin/bin/schematool -initSchema -dbType postgres -ifNotExists
     echo >> /opt/apache-hive-metastore-3.0.0-bin/conf/initialised
 fi
 

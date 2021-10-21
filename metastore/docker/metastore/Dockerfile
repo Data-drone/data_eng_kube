@@ -19,7 +19,7 @@ RUN curl -L https://www.apache.org/dist/hive/hive-standalone-metastore-${METASTO
     cp postgresql-42.2.24.jar ${HIVE_HOME}/lib/ && \
     rm -rf  postgresql-42.2.24.jar
 
-RUN curl -L https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-web/2.14.1/log4j-web-2.14.1.jar --output ${HIVE_HOME}/lib/log4j-web-2.14.1.jar
+#RUN curl -L https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-web/2.14.1/log4j-web-2.14.1.jar --output ${HIVE_HOME}/lib/log4j-web-2.14.1.jar
 
 COPY conf/metastore-site.xml.j2 ${HIVE_HOME}/conf
 COPY conf/configure.sh ${HIVE_HOME}/conf
@@ -40,5 +40,8 @@ RUN rm ${HIVE_HOME}/conf/metastore-site.xml
 RUN rm ${HADOOP_HOME}/share/hadoop/common/lib/slf4j-log4j12-1.7.25.jar
 
 USER hive
+
+ENV JAVA_OPTS='-Djava.net.preferIPv4Stack=true'
+EXPOSE 9083
 
 ENTRYPOINT ["sh", "-c", "/entrypoint.sh"]

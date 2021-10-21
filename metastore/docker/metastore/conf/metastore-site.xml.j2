@@ -1,8 +1,7 @@
 <configuration>
     <property>
         <name>metastore.thrift.uris</name>
-        <value>thrift://${HOSTNAME}:9083</value>
-        <description>Thrift URI for the remote metastore. Used by metastore client to connect to remote metastore.</description>
+        <value>${METASTORE_SERVICE_PORT_9083_TCP_ADDR}:9083</value>
     </property>
     <property>
         <name>metastore.task.threads.always</name>
@@ -15,6 +14,10 @@
     <property>
         <name>metastore.warehouse.dir</name>
         <value>s3a://data/warehouse/</value>
+    </property>
+    <property>
+        <name>metastore.thrift.port</name>
+        <value>9083</value>
     </property>
     <property>
         <name>metastore.try.direct.sql.ddl</name>
