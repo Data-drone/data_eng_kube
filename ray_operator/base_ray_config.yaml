@@ -94,7 +94,7 @@ clusterOnly: false
 namespacedOperator: false
 # operatorNamepsace - If using a cluster-scoped operator (namespacedOperator: false), set the namespace
 # in which to launch the operator.
-operatorNamespace: default
+operatorNamespace: ray
 # operatorImage - The image used in the operator deployment.
 operatorImage: rayproject/ray:latest
 # `rayproject/ray:latest` contains the latest official release version of Ray.
