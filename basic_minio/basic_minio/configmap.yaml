@@ -5,5 +5,6 @@ metadata:
   annotations:
     kubed.appscode.com/sync: "true"
 data:
+  minio_url: http://basic-minio-service.basic-minio.svc.cluster.local:9000
   minio_endpoint: basic-minio-service.basic-minio.svc.cluster.local
   minio_service_port: "9000"

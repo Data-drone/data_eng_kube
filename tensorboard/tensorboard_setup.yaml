@@ -17,7 +17,7 @@ spec:
       containers:
       - name: tensorboard
         command: ["/bin/sh", "-c"]
-        args: ["tensorboard --logdir=s3://dl-logs/test-model/resnet/ --bind_all --path_prefix=/tensorboard"]
+        args: ["tensorboard --logdir=s3://dl-logs/test-model --bind_all --path_prefix=/tensorboard"]
         image: k3d--registry:5000/datadrone/tfio_tensorboard
         env:
         - name: AWS_ACCESS_KEY_ID
@@ -25,7 +25,7 @@ spec:
         - name: AWS_SECRET_ACCESS_KEY
           valueFrom: { secretKeyRef: { name: minio-secret, key: minio-root-password } }
         - name: S3_ENDPOINT
-          valueFrom: { configMapKeyRef: { name: minio-endpoint-configmap, key: minio_endpoint } }
+          valueFrom: { configMapKeyRef: { name: minio-endpoint-configmap, key: minio_url } }
         - name: S3_VERIFY_SSL
           value: '0'
         - name: S3_USE_HTTPS
